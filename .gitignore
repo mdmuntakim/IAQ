@@ -1,9 +1,5 @@
 build/
-*.apk
-*.ap_
-*.dex
 *.class
-.gradle/
-local.properties
+*.jar
 .DS_Store
-signing/
+local.properties

@@ -1,0 +1,41 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build and run the test suite
+        run: bash build.sh
+
+      - name: Smoke test the JAR
+        run: |
+          java -jar build/IAQ.jar version
+          java -jar build/IAQ.jar remaster docs/benchmark/before.png \
+            -o /tmp/iaq-smoke.png --scale 1 --quiet
+          java -jar build/IAQ.jar probe /tmp/iaq-smoke.png
+
+      - name: Upload IAQ.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: IAQ.jar
+          path: build/IAQ.jar
+          if-no-files-found: error
