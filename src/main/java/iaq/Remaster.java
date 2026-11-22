@@ -116,6 +116,7 @@ public final class Remaster {
         Grade.apply(img.r, img.g, img.b, w, h, strength);
         if (o.glow) Grade.bloom(img.r, img.g, img.b, w, h, strength);
         Grade.vignette(img.r, img.g, img.b, w, h, strength);
+        Grade.finish(img.r, img.g, img.b, w, h, strength);
 
         Result result = new Result();
         result.width = w;

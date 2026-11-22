@@ -47,27 +47,27 @@ lighting, the contrast, the clarity and the colour depth.
 | Image | Size | Mean luma | Contrast | Saturation | Sharpness | Clip hi / lo |
 | --- | --- | --- | --- | --- | --- | --- |
 | before.png | 1800x900 | 0.387 | 0.290 | 0.450 | 0.0225 | 0.17% / 2.59% |
-| IAQ 2x (8 bit) | 3600x1800 | 0.407 | 0.326 | 0.550 | 0.0134 | 0.00% / 0.00% |
+| IAQ 2x (8 bit) | 3600x1800 | 0.387 | 0.330 | 0.573 | 0.0163 | 0.00% / 0.01% |
 | after.jpg (reference) | 1200x896 | 0.364 | 0.304 | 0.452 | 0.0540 | 1.48% / 0.00% |
 
 Sharpness is a per-pixel Laplacian mean, so it falls when the image is upscaled
 and is not comparable between resolutions. Contrast and colour depth are the
 meaningful numbers: IAQ is above the reference on both, and unlike the
-reference it clips nothing.
+reference it clips no highlights and only 0.01% of its shadows.
 
 Region averages on the supplied pair:
 
 | Region | Before | IAQ | Reference |
 | --- | --- | --- | --- |
-| sky (upper centre) | 250, 165, 46 | 245, 202, 76 | 250, 205, 70 |
-| skin (cheek area) | 214, 167, 100 | ~220, 173, 89 | 199, 139, 102 |
-| shadow / dark cloth | 142, 83, 67 | deeper than input | 111, 76, 65 |
+| sky (upper centre) | 250, 165, 46 | 245, 200, 72 | 250, 205, 70 |
+| shadow / dark cloth | 142, 83, 67 | 148, 89, 63 | 111, 76, 65 |
 
-The sky is the clearest win: the reference lifts green by about 40 and blue by
+The sky is the clearest win: the reference lifts green by about 35 and blue by
 about 25 levels while keeping red, turning flat orange into golden cream. IAQ
-reproduces that within a few levels. The reference's skin is redder because it
-was re-drawn; IAQ deliberately keeps the original skin hue rather than
-inventing a new one.
+reproduces that within five levels. The reference's skin and shadows are
+redder and darker because the frame was re-drawn; IAQ deliberately keeps the
+source's skin hue instead of inventing a new one, and only pulls the shadows
+down to the reference's depth.
 
 ## Reproduce it
 
@@ -100,7 +100,10 @@ a flat sky. The final version:
    gets the golden treatment while skin and white cloth do not;
 4. protects shadows in CLAHE with a luma mask, so deep cloth stays deep;
 5. uses a quarter-resolution bloom at a 0.72 threshold instead of washing the
-   whole frame.
+   whole frame;
+6. ends with a final toe after the glow, so the bloom cannot lift the blacks
+   back up.
 
-That is why the measured saturation moved from 0.61 to 0.55 and the sky landed
-within a few levels of the reference.
+That is why the measured saturation moved from 0.61 to 0.57, the mean luma
+stayed at the source's 0.387 while contrast rose to 0.330, and the sky landed
+within five levels of the reference.

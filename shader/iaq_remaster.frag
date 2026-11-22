@@ -152,6 +152,10 @@ void main() {
     float d = length(p) / 0.70710678;
     c *= 1.0 - 0.16 * smoothstep(0.55, 1.05, d);
 
+    /* Final toe: keep the bloom from lifting the blacks. */
+    float toeMask = 1.0 - smoothstep(0.16, 0.72, luma(c));
+    c *= 1.0 - 0.16 * toeMask;
+
     c = clamp(c, 0.0, 1.0);
 
     /* --- dither, so 8-bit output does not band in the sky --- */

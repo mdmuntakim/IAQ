@@ -254,7 +254,7 @@ public final class Filters {
                 double mapped = m0 + (m1 - m0) * fy;
 
                 double target = y[i] + (mapped - y[i]) * strength
-                        * (0.35 + 0.65 * Color.smoothstep(0.12, 0.55, y[i]));
+                        * (0.20 + 0.80 * Color.smoothstep(0.12, 0.55, y[i]));
                 double scale = target / Math.max(1e-4, y[i]);
                 if (scale < 0.55) scale = 0.55;
                 else if (scale > 1.8) scale = 1.8;

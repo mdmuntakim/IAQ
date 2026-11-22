@@ -34,7 +34,7 @@ The deliverable is **`IAQ.jar`**, built by `build.sh` with nothing but the JDK.
 ## The pipeline
 
 Every stage is row-parallel and allocation-conscious; a 1800x900 frame becomes
-3600x1800 in about two seconds on four cores.
+3600x1800 in about 1.6 seconds on four cores.
 
 | # | Stage | What it fixes |
 | --- | --- | --- |
@@ -132,14 +132,14 @@ Measured on the supplied pair (`java -jar build/IAQ.jar probe ...`):
 | Image | Size | Mean luma | Contrast | Saturation | Sharpness | Clipping hi/lo |
 | --- | --- | --- | --- | --- | --- | --- |
 | Original | 1800x900 | 0.387 | 0.290 | 0.450 | 0.0225 | 0.17% / 2.59% |
-| **IAQ 2x** | 3600x1800 | **0.407** | **0.326** | **0.550** | 0.0134 | **0.00% / 0.00%** |
+| **IAQ 2x** | 3600x1800 | **0.387** | **0.330** | **0.573** | 0.0163 | **0.00% / 0.01%** |
 | Reference render | 1200x896 | 0.364 | 0.304 | 0.452 | 0.0540 | 1.48% / 0.00% |
 
 Sharpness is a per-pixel Laplacian mean, so it is not comparable across
 different resolutions; compare the 100% crops in the benchmark document
 instead. The important result is that IAQ raises contrast and colour depth
-without clipping a single highlight or crushing a shadow, while the reference
-clips 1.48% of its highlights.
+without clipping a single highlight and with only 0.01% shadow clipping, while
+the reference clips 1.48% of its highlights.
 
 ### Performance
 
@@ -147,12 +147,14 @@ Measured on the 4 vCPU runner used to build this release:
 
 | Job | Time |
 | --- | --- |
-| 1800x900 → 3600x1800, engine only | ~1.4 s |
-| 1800x900 → 3600x1800, including PNG encode | ~3.5 s |
-| 1800x900 → 3600x1800, 16 bit PNG encode | ~5 s |
+| 1800x900 → 3600x1800, engine only | ~1.6 s |
+| 1800x900 → 3600x1800, including 8 bit PNG encode | ~3.6 s |
+| 1800x900 → 3600x1800, including 16 bit PNG encode | ~11 s |
+| 1800x900 → 3840x1920, including 8 bit PNG encode | ~9 s |
 
 The pipeline is O(pixels) apart from the two small Gaussian radii; the bloom
-runs on a quarter-resolution copy.
+runs on a quarter-resolution copy.  The 16 bit case is dominated by writing the
+33 MB PNG, not by the remaster itself.
 
 ## Tests
 

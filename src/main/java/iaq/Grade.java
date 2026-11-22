@@ -27,11 +27,11 @@ public final class Grade {
                 rr = (rr - 0.012) / 0.988;
                 gg = (gg - 0.012) / 0.988;
                 bb = (bb - 0.012) / 0.988;
-                rr = Math.pow(Color.clamp01(rr), 1.06) * 1.02;
-                gg = Math.pow(Color.clamp01(gg), 1.06) * 1.02;
-                bb = Math.pow(Color.clamp01(bb), 1.06) * 1.02;
+                rr = Math.pow(Color.clamp01(rr), 1.10) * 1.02;
+                gg = Math.pow(Color.clamp01(gg), 1.10) * 1.02;
+                bb = Math.pow(Color.clamp01(bb), 1.10) * 1.02;
 
-                double contrast = 0.36 * s;
+                double contrast = 0.40 * s;
                 double y0 = Color.luma601((float) rr, (float) gg, (float) bb);
                 double y1 = scurve(y0, contrast);
                 double k = y1 / Math.max(1e-4, y0);
@@ -232,6 +232,29 @@ public final class Grade {
                 double d = Math.sqrt(dx * dx + dy * dy) / 0.70710678;
                 double v = 1.0 - amount * Color.smoothstep(0.55, 1.05, d);
                 int i = row + x;
+                r[i] = Color.clamp01(r[i] * v);
+                g[i] = Color.clamp01(g[i] * v);
+                b[i] = Color.clamp01(b[i] * v);
+            }
+        });
+    }
+
+    /**
+     * Final toe: pull the mid-tones and shadows down after the glow has been
+     * added.  Doing it last means the bloom cannot lift the blacks back up,
+     * which is what keeps the dark cloth and the red buildings as deep as the
+     * reference remaster.
+     */
+    public static void finish(float[] r, float[] g, float[] b, int w, int h, double strength) {
+        if (strength <= 0.001) return;
+        final double amount = 0.16 * strength;
+        Parallel.rows(h, y -> {
+            int row = y * w;
+            for (int x = 0; x < w; x++) {
+                int i = row + x;
+                double lum = Color.luma601(r[i], g[i], b[i]);
+                double mask = 1.0 - Color.smoothstep(0.16, 0.72, lum);
+                double v = 1.0 - amount * mask;
                 r[i] = Color.clamp01(r[i] * v);
                 g[i] = Color.clamp01(g[i] * v);
                 b[i] = Color.clamp01(b[i] * v);
