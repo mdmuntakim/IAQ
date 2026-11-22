@@ -120,11 +120,11 @@ while IFS= read -r f; do APP_SOURCES+=("$f"); done < <(find app/src -name '*.jav
 R_JAVA="$GEN/app/bxanimator/R.java"
 [ -f "$R_JAVA" ] || die "R.java was not generated"
 
-log "compiling app (${#APP_SOURCES[@]} files)"
+log "compiling app (${#APP_SOURCES[@]} files + ${#CORE_SOURCES[@]} core files)"
 javac "${JAVAC_FLAGS[@]}" \
   -classpath "$PLATFORM_JAR" \
   -d "$CLASSES" \
-  "$R_JAVA" "${APP_SOURCES[@]}"
+  "$R_JAVA" "${CORE_SOURCES[@]}" "${APP_SOURCES[@]}"
 
 # ------------------------------------------------------------------------ dex
 log "dexing"

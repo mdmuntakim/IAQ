@@ -162,6 +162,11 @@ public final class Track {
         keys.clear();
     }
 
+    /** Offsets every key value, keeping the timing (whole animation nudge). */
+    public void offsetValues(float delta) {
+        for (Key k : keys) k.value += delta;
+    }
+
     /** Keeps key times stable across a JSON round trip (four decimal places). */
     public static double quantize(double time) {
         return Math.round(time * QUANTUM) / QUANTUM;
